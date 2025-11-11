@@ -1,60 +1,56 @@
-const form = document.getElementById("registerForm");
-if (form) {
-  const password = document.getElementById("password");
-  const confirm = document.getElementById("confirm");
-  const strength = document.getElementById("password-strength");
-  const message = document.getElementById("message");
-
-  password.addEventListener("input", () => {
-    const val = password.value;
-    let strengthValue = "";
-
-    if (val.length < 6) {
-      strengthValue = "Weak 😟";
-      strength.style.color = "red";
-    } else if (val.match(/[A-Z]/) && val.match(/[0-9]/) && val.length >= 8) {
-      strengthValue = "Strong 💪";
-      strength.style.color = "green";
-    } else {
-      strengthValue = "Medium 🙂";
-      strength.style.color = "orange";
-    }
-
-    strength.textContent = "Password Strength: " + strengthValue;
-  });
-
-  form.addEventListener("submit", (e) => {
+// Handle Registration
+const registerForm = document.getElementById("registerForm");
+if (registerForm) {
+  registerForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const email = document.getElementById("email").value;
     const name = document.getElementById("name").value;
-    const pass = password.value;
-    const conf = confirm.value;
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const message = document.getElementById("registerMessage");
 
-    if (!emailPattern.test(email)) {
-      message.textContent = "❌ Invalid email format!";
-      message.style.color = "red";
-      return;
-    }
-
-    if (pass !== conf) {
+    if (password !== confirmPassword) {
       message.textContent = "❌ Passwords do not match!";
       message.style.color = "red";
       return;
     }
 
-    // Save user data locally
-    const userData = { name, email, password: pass };
-    localStorage.setItem("registeredUser", JSON.stringify(userData));
+    if (password.length < 6) {
+      message.textContent = "❌ Password must be at least 6 characters!";
+      message.style.color = "red";
+      return;
+    }
 
-    message.textContent = "✅ Registration Successful! Redirecting to Login...";
+    localStorage.setItem("user", JSON.stringify({ name, email, password }));
+    message.textContent = "✅ Registration successful!";
     message.style.color = "green";
-
-    form.reset();
-    strength.textContent = "";
 
     setTimeout(() => {
       window.location.href = "login.html";
-    }, 1500);
+    }, 1000);
+  });
+}
+
+// Handle Login
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser || storedUser.email !== email || storedUser.password !== password) {
+      message.textContent = "❌ Invalid email or password!";
+      message.style.color = "red";
+      return;
+    }
+
+    message.textContent = "✅ Login successful!";
+    message.style.color = "green";
+    setTimeout(() => {
+      window.location.href = "survey.html";
+    }, 1000);
   });
 }
